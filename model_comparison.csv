@@ -1,0 +1,6 @@
+,accuracy,precision,recall,roc_auc,pr_auc
+LightGBM,0.8673,0.761,0.5098,0.8885,0.7322
+XGBoost,0.8667,0.7598,0.5065,0.8862,0.7279
+Random Forest,0.8433,0.6449,0.5163,0.8323,0.6231
+Logistic Regression,0.8113,0.6237,0.1895,0.7918,0.5175
+Neural Network,0.7773,0.4247,0.2582,0.6579,0.3547

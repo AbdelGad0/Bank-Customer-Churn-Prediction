@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Runtime uploads & logs
+webapp/uploads/
+catboost_info/
+
+# Secrets
+.env
+*.pem
+*.key
+
+# OS / editors
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

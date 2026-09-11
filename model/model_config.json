@@ -1,0 +1,22 @@
+{
+  "threshold": 0.23999999999999996,
+  "feature_columns": [
+    "Age",
+    "Balance",
+    "NumOfProducts",
+    "IsActiveMember",
+    "Geography_Germany",
+    "Geography_Spain",
+    "Gender_Male"
+  ],
+  "numeric_order": [
+    "Age",
+    "Balance",
+    "NumOfProducts",
+    "IsActiveMember"
+  ],
+  "cat_cols": [
+    "Geography",
+    "Gender"
+  ]
+}

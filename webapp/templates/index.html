@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChurnScope | Bank Customer Churn Prediction</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9724;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">◈</span>
+    <span>Churn<span class="accent">Scope</span></span>
+  </div>
+  <div class="topbar-actions">
+    <div class="brand-badge">
+      <span data-i18n="badge_model">XGBoost model ✓</span> ·
+      <span data-i18n="badge_thr">Decision threshold</span> <b id="thrBadge">0.24</b>
+    </div>
+    <button id="langToggle" class="lang-btn" type="button">
+      <span class="lang-globe">&#127760;</span>
+      <span data-i18n="switch_lang">العربية</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 data-i18n="hero_title">Will your customer stay with the bank?</h1>
+    <p class="sub" data-i18n-html="hero_sub">
+      An ML-powered tool that estimates the <b>probability a customer will churn</b>
+      (stop banking with you), trained on 10,000 customers with a <b>ROC-AUC of 0.87</b>.
+    </p>
+    <div class="chips">
+      <span class="chip"><i>◉</i> <span data-i18n="chip_recall">Recall 83%</span></span>
+      <span class="chip"><i>◉</i> <span data-i18n="chip_pr">PR-AUC 0.73</span></span>
+      <span class="chip"><i>◉</i> <span data-i18n="chip_cases">100K+ samples</span></span>
+    </div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="single">
+      <span class="tab-ico">&#128100;</span> <span data-i18n="tab_single">Single Customer</span>
+    </button>
+    <button class="tab-btn" data-tab="batch">
+      <span class="tab-ico">&#128193;</span> <span data-i18n="tab_batch">Upload CSV / Excel</span>
+    </button>
+  </nav>
+
+  <!-- ============ SINGLE ============ -->
+  <section id="tab-single" class="tab active">
+    <div class="card">
+      <h2 class="card-title" data-i18n="single_title">Customer Details</h2>
+      <form id="singleForm" novalidate>
+        <div class="grid">
+          <label class="field">
+            <span data-i18n="f_age">Age</span>
+            <input type="number" id="age" min="18" max="92" step="1" value="38" required>
+          </label>
+          <label class="field">
+            <span data-i18n="f_country">Country</span>
+            <select id="geography">
+              <option value="France" data-i18n="opt_france">France</option>
+              <option value="Germany" data-i18n="opt_germany">Germany</option>
+              <option value="Spain" data-i18n="opt_spain">Spain</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="f_gender">Gender</span>
+            <select id="gender">
+              <option value="Female" data-i18n="opt_female">Female</option>
+              <option value="Male" data-i18n="opt_male">Male</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="f_balance">Current Balance (€)</span>
+            <input type="number" id="balance" min="0" step="0.01" value="80000">
+          </label>
+          <label class="field">
+            <span data-i18n="f_products">Number of Products</span>
+            <select id="numOfProducts">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="f_active">Active Member</span>
+            <select id="isActiveMember">
+              <option value="1" data-i18n="opt_active">Active</option>
+              <option value="0" data-i18n="opt_inactive">Inactive</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="btn primary" id="singleBtn">
+          <span class="btn-ico">&#9889;</span> <span data-i18n="btn_predict">Predict Now</span>
+        </button>
+      </form>
+    </div>
+
+    <div id="singleResult" class="card result hidden">
+      <h2 class="card-title" data-i18n="result_title">Prediction Result</h2>
+      <div class="result-layout">
+        <div class="gauge-wrap"><canvas id="gauge"></canvas></div>
+        <div class="result-info">
+          <div class="big-prob"><span id="probPct">—</span><small>%</small></div>
+          <div class="risk-badge" id="riskBadge">—</div>
+          <p class="hint">
+            <span data-i18n-html="hint_pre">Probability above the decision threshold</span>
+            <b id="thrInfo">0.24</b>
+            <span data-i18n-html="hint_post">means high churn risk</span>
+          </p>
+          <button class="btn ghost" id="resetBtn"><span data-i18n="btn_new">New Prediction</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BATCH ============ -->
+  <section id="tab-batch" class="tab">
+    <div class="card">
+      <h2 class="card-title" data-i18n="batch_title">Batch Prediction — Upload a Data File</h2>
+      <div class="dropzone" id="dropzone">
+        <div class="dz-ico">&#128228;</div>
+        <p class="dz-main" data-i18n-html="dz_main">
+          Drag &amp; drop your file here, or <span class="dz-link">click to browse</span>
+        </p>
+        <p class="dz-hint" data-i18n-html="dz_hint">Accepted formats: <b>.csv · .xlsx · .xls</b></p>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
+      </div>
+      <div class="template-row">
+        <span data-i18n="tpl_label">New here?</span>
+        <a href="/api/template" download="template.csv" class="link" data-i18n="tpl_link">Download a sample file</a>
+      </div>
+      <div class="progress hidden" id="progress">
+        <div class="spinner"></div><span data-i18n="progress">Processing file and predicting...</span>
+      </div>
+      <div id="errorBox" class="error hidden"></div>
+    </div>
+
+    <div id="batchResult" class="card hidden">
+      <div class="summary" id="summary"></div>
+      <div class="table-wrap">
+        <table id="resultsTable">
+          <thead><tr id="tableHead"></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <p class="table-note" id="tableNote"></p>
+      <button class="btn secondary" id="downloadBtn">
+        <span class="btn-ico">&#11015;</span> <span data-i18n="btn_download">Download Results (CSV)</span>
+      </button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p data-i18n="footer">ChurnScope · Bank Customer Churn Prediction — built with Python / Flask / XGBoost</p>
+</footer>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
