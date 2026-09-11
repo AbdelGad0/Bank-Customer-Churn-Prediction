@@ -1,0 +1,13 @@
+.vercel
+node_modules
+__pycache__
+*.pyc
+catboost_info
+screenshots
+eda_plots
+data_splits
+data_splits_fe
+Churn_Modelling.csv
+Churn_Modelling_cleaned.csv
+pr_curve_thresholds.png
+*.joblib.tmp

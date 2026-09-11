@@ -18,5 +18,22 @@
   "cat_cols": [
     "Geography",
     "Gender"
+  ],
+  "onehot_map": [
+    {
+      "feature": "Geography_Germany",
+      "col": "Geography",
+      "cat": "Germany"
+    },
+    {
+      "feature": "Geography_Spain",
+      "col": "Geography",
+      "cat": "Spain"
+    },
+    {
+      "feature": "Gender_Male",
+      "col": "Gender",
+      "cat": "Male"
+    }
   ]
 }
